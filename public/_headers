@@ -1,0 +1,24 @@
+# Cloudflare Pages 响应头文件。
+# Vite 会把 public/ 里的东西整个拷进 dist/，所以它最终落在 dist/_headers，
+# 由 Pages 读取生效；这个文件本身不会被当成静态资源对外提供。
+#
+# 为什么必须有这一对头：
+# Whisper 用的 onnxruntime-web 是「多线程 SIMD」构建（public/ort/ 下那两个文件），
+# 依赖 SharedArrayBuffer，而 SharedArrayBuffer 只在 crossOriginIsolated 的页面里可用，
+# 也就是必须同时带上 COOP + COEP。开发时这对头是 vite.config.ts 的 dev server 加的
+# （见 server.headers），静态托管上没人替你加 —— 不补的话部署后页面能打开，
+# 但模型加载会失败。
+#
+# 自查方式：部署后在控制台执行 self.crossOriginIsolated，应当是 true。
+#
+# 语法：路径行顶格，紧跟缩进两格的 "头名: 值"；顶格以 # 开头的行是注释。
+#
+# 缓存规则是可选项，需要的话把下面四行前面的 # 去掉，并挪到文件最末尾：
+# /ort/*
+#   Cache-Control: public, max-age=604800
+# /assets/*
+#   Cache-Control: public, max-age=604800
+
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless

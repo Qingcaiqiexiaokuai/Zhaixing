@@ -1,0 +1,21 @@
+# ---------------------------------------------------------------------------
+# Cloudflare Pages 配置（纯前端静态站点：Vite + React，没有 Worker / Functions 入口）
+#
+# 关键就是 pages_build_output_dir 这一行：它告诉 wrangler「这是 Pages 项目，
+# 构建产物在 ./dist」，于是部署时不需要再手写目录参数。
+#
+# 三件要注意的事：
+# 1. name 必须和你 Cloudflare 里那个 Pages 项目名完全一致，否则会去部署/新建另一个项目；
+# 2. 一旦用了这个文件，它就变成项目配置的「唯一事实来源」，同名项在 Dashboard 里改不动了；
+# 3. 不要在这里加 Workers 的 [assets] / main —— Pages 项目和 Workers 静态资源是两套
+#    配置，混在一起 wrangler 会直接报错。
+# ---------------------------------------------------------------------------
+
+name = "inspiration-vault"
+pages_build_output_dir = "./dist"
+
+# 用 wrangler 配置文件时必须显式写兼容日期（Dashboard 里设的 "Latest" 不会同步过来）
+compatibility_date = "2026-10-03"
+
+# 想在编辑器里有配置补全提示的话，先 `npm i -D wrangler`，再打开下面这行：
+# "$schema" = "./node_modules/wrangler/config-schema.json"
